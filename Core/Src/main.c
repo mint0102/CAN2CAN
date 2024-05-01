@@ -63,13 +63,14 @@ uint16_t NumBytesReq = 0;
 uint8_t  REQ_BUFFER  [4096];
 uint8_t  REQ_1BYTE_DATA;
 
-uint8_t CAN1_DATA_TX[8] = {0x0a,0x0b,0x00,0x00,0x00,0x00,0x00,0x00};
+uint8_t CAN1_DATA_TX[8] = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
 uint8_t CAN1_DATA_RX[8] = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
 uint8_t CAN2_DATA_TX[8] = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
 uint8_t CAN2_DATA_RX[8] = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
 
 uint16_t Num_Consecutive_Tester;
 uint8_t  Flg_Consecutive = 0;
+uint8_t data[2] = {0x00, 0x00};
 
 unsigned int TimeStamp;
 // maximum characters send out via UART is 30
@@ -145,38 +146,40 @@ int main(void)
   __HAL_UART_ENABLE_IT(&huart3, UART_IT_RXNE);
 
   //can1
-	CAN1_pHeader.StdId = 0x0A2; //A2 gửi
-//	CAN1_pHeaderRx.StdId = 0x0A2;
-	CAN1_pHeader.DLC = 2;
+	CAN1_pHeader.StdId = 0x012; //12 gửi
+	CAN1_pHeaderRx.StdId = 0x0A2;
+	CAN1_pHeader.DLC = 8;
 	CAN1_pHeader.ExtId = 0;
 	CAN1_pHeader.IDE = CAN_ID_STD;
 	CAN1_pHeader.RTR = CAN_RTR_DATA;
 	CAN1_pHeader.TransmitGlobalTime = DISABLE;
 	HAL_CAN_AddTxMessage(&hcan1, &CAN1_pHeader, CAN1_DATA_TX, &CAN1_pTxMailbox);
 
-	CAN2_sFilterConfig.FilterBank = 13;
-	CAN2_sFilterConfig.FilterMode = CAN_FILTERMODE_IDMASK;
-	CAN2_sFilterConfig.FilterFIFOAssignment = CAN_RX_FIFO0;
-	CAN2_sFilterConfig.FilterIdHigh = 0;
-	CAN2_sFilterConfig.FilterIdLow = 0x0A2;
-	CAN2_sFilterConfig.FilterMaskIdHigh = 0;
-	CAN2_sFilterConfig.FilterMaskIdLow = 0x7FF;
-	CAN2_sFilterConfig.FilterScale = CAN_FILTERSCALE_16BIT;
-	CAN2_sFilterConfig.FilterActivation = ENABLE;
-	CAN2_sFilterConfig.SlaveStartFilterBank = 13;
-	//
-	CAN2_pHeader.StdId = 0x012;
-	CAN2_pHeaderRx.StdId = 0x0A2;
+	//can2
+	CAN2_pHeader.StdId = 0x0A2;
+	CAN2_pHeaderRx.StdId = 0x012;
 	CAN2_pHeader.DLC = 8;
 	CAN2_pHeader.ExtId = 0;
 	CAN2_pHeader.IDE = CAN_ID_STD;
 	CAN2_pHeader.RTR = CAN_RTR_DATA;
 	CAN2_pHeader.TransmitGlobalTime = DISABLE;
 
+	CAN2_sFilterConfig.FilterBank = 14;
+	CAN2_sFilterConfig.FilterMode = CAN_FILTERMODE_IDMASK;
+	CAN2_sFilterConfig.FilterFIFOAssignment = CAN_RX_FIFO0;
+	CAN2_sFilterConfig.FilterIdHigh = 0;
+	CAN2_sFilterConfig.FilterIdLow = 0x012;
+	CAN2_sFilterConfig.FilterMaskIdHigh = 0;
+	CAN2_sFilterConfig.FilterMaskIdLow = 0x7FF;
+	CAN2_sFilterConfig.FilterScale = CAN_FILTERSCALE_16BIT;
+	CAN2_sFilterConfig.FilterActivation = ENABLE;
+	CAN2_sFilterConfig.SlaveStartFilterBank = 14;
+	//
+
 	MX_CAN1_Setup();
 	MX_CAN2_Setup();
-	uint8_t temp_start = 0;
-	HAL_UART_Receive_IT(&huart3, &temp_start, 1);
+//	uint8_t temp_start = 0;
+	HAL_UART_Receive_IT(&huart3, data, 2);
 	HAL_GPIO_WritePin(LED_RX_GPIO_Port, LED_RX_Pin, 0);
 
   /* USER CODE END 2 */
@@ -190,31 +193,7 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  HAL_CAN_AddTxMessage(&hcan1, &CAN1_pHeader, CAN1_DATA_TX, &CAN1_pTxMailbox);
-	  if (HAL_CAN_AddTxMessage(&hcan1, &CAN1_pHeader, CAN1_DATA_TX, &CAN1_pTxMailbox) == HAL_OK){
-		  HAL_GPIO_TogglePin(LED_TX_GPIO_Port, LED_TX_Pin);
-	  }
-	  HAL_Delay(500);
-//
-//	 int data[7] = {0x2A, 0x0D, 0x00, 0xA3, 0x22, 0x00, 0x6C};
-//	 int data1[7] = {0xA2, 0x5A, 0xFE, 0x9F, 0x8C, 0x04, 0x10};
-//	 int crc = 0;
-//	 crc = calc_SAE_J1850(data, 7);
-////	 HAL_UART_Transmit(&huart3, CAN2_DATA_RX, 8, 10);
-//    if(!BtnU) /*IG OFF->ON stimulation*/
-//    {
-//      delay(20);
-//      USART3_SendString((uint8_t *)"IG OFF ");
-//      while(!BtnU);
-//      MX_CAN1_Setup();
-//      MX_CAN2_Setup();
-//      USART3_SendString((uint8_t *)"-> IG ON \n");
-//      delay(20);
-//    }
   }
-//
-//  memset(&REQ_BUFFER,0x00,4096);
-//  NumBytesReq = 0;
 
   /* USER CODE END 3 */
 }
@@ -284,8 +263,8 @@ static void MX_CAN1_Init(void)
   hcan1.Init.Prescaler = 10;
   hcan1.Init.Mode = CAN_MODE_NORMAL;
   hcan1.Init.SyncJumpWidth = CAN_SJW_2TQ;
-  hcan1.Init.TimeSeg1 = CAN_BS1_4TQ;
-  hcan1.Init.TimeSeg2 = CAN_BS2_3TQ;
+  hcan1.Init.TimeSeg1 = CAN_BS1_5TQ;
+  hcan1.Init.TimeSeg2 = CAN_BS2_2TQ;
   hcan1.Init.TimeTriggeredMode = DISABLE;
   hcan1.Init.AutoBusOff = DISABLE;
   hcan1.Init.AutoWakeUp = DISABLE;
@@ -321,8 +300,8 @@ static void MX_CAN2_Init(void)
   hcan2.Init.Prescaler = 10;
   hcan2.Init.Mode = CAN_MODE_NORMAL;
   hcan2.Init.SyncJumpWidth = CAN_SJW_2TQ;
-  hcan2.Init.TimeSeg1 = CAN_BS1_4TQ;
-  hcan2.Init.TimeSeg2 = CAN_BS2_3TQ;
+  hcan2.Init.TimeSeg1 = CAN_BS1_5TQ;
+  hcan2.Init.TimeSeg2 = CAN_BS2_2TQ;
   hcan2.Init.TimeTriggeredMode = DISABLE;
   hcan2.Init.AutoBusOff = DISABLE;
   hcan2.Init.AutoWakeUp = DISABLE;
@@ -482,38 +461,20 @@ void PrintCANLog(uint16_t CANID, uint8_t * CAN_Frame)
 }
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
-	REQ_BUFFER[NumBytesReq] = REQ_1BYTE_DATA;
-	NumBytesReq++;
+//	REQ_BUFFER[NumBytesReq] = REQ_1BYTE_DATA;
+//	NumBytesReq++;
+	HAL_UART_Receive_IT(&huart3, data, 2);
+	CAN1_DATA_TX[0] = data[0];
+	CAN1_DATA_TX[1] = data[1];
+	HAL_CAN_AddTxMessage(&hcan1, &CAN1_pHeader, CAN1_DATA_TX, &CAN1_pTxMailbox);
+	HAL_GPIO_TogglePin(LED_TX_GPIO_Port, LED_TX_Pin);
+
 	//REQ_BUFFER[7] = NumBytesReq;
+
 }
 void delay(uint16_t delay)
 {
 	HAL_Delay(delay);
-}
-int calc_SAE_J1850(int data[], int Crc_len){
-	int idx, crc, temp, temp1, temp2, idy;
-	crc = 0;
-	idy = 0;
-	temp = 0;
-	temp1 = 0;
-	temp2 = 0;
-	for(idx =0; idx < Crc_len+1; idx++){
-		if(idx == 0){
-			temp1 = 0;
-		}
-		else{
-			temp1 = data[Crc_len-idx];
-		}
-		crc = (crc^temp1);
-		for(idy = 8; idy >0; idy--){
-			temp2 = crc;
-			crc <<= 1;
-			if((temp2 & 128) != 0){
-				crc ^= 0x1D;
-			}
-		}
-	}
-	return crc;
 }
 
 
@@ -523,9 +484,35 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 	for(int i = 2; i< 8; i++){
 		CAN2_DATA_RX[i] = CAN2_DATA_RX[i-1] + CAN2_DATA_RX[i-2];
 	}
-	HAL_GPIO_WritePin(LED_RX_GPIO_Port, LED_RX_Pin, 1);
+	HAL_GPIO_TogglePin(LED_RX_GPIO_Port, LED_RX_Pin);
 	HAL_UART_Transmit(&huart3, CAN2_DATA_RX, 8, 10);
 }
+
+//int calc_SAE_J1850(int data[], int Crc_len){
+//	int idx, crc, temp, temp1, temp2, idy;
+//	crc = 0;
+//	idy = 0;
+//	temp = 0;
+//	temp1 = 0;
+//	temp2 = 0;
+//	for(idx =0; idx < Crc_len+1; idx++){
+//		if(idx == 0){
+//			temp1 = 0;
+//		}
+//		else{
+//			temp1 = data[Crc_len-idx];
+//		}
+//		crc = (crc^temp1);
+//		for(idy = 8; idy >0; idy--){
+//			temp2 = crc;
+//			crc <<= 1;
+//			if((temp2 & 128) != 0){
+//				crc ^= 0x1D;
+//			}
+//		}
+//	}
+//	return crc;
+//}
 /* USER CODE END 4 */
 
 /**

@@ -34,37 +34,37 @@ $(wildcard ../makefile.init) \
 $(wildcard ../makefile.targets) \
 
 
-BUILD_ARTIFACT_NAME := BEA_CAN2CAN_DEMO_TEN1HC_HUST
+BUILD_ARTIFACT_NAME := CAN2CAN
 BUILD_ARTIFACT_EXTENSION := elf
 BUILD_ARTIFACT_PREFIX :=
 BUILD_ARTIFACT := $(BUILD_ARTIFACT_PREFIX)$(BUILD_ARTIFACT_NAME)$(if $(BUILD_ARTIFACT_EXTENSION),.$(BUILD_ARTIFACT_EXTENSION),)
 
 # Add inputs and outputs from these tool invocations to the build variables 
 EXECUTABLES += \
-BEA_CAN2CAN_DEMO_TEN1HC_HUST.elf \
+CAN2CAN.elf \
 
 MAP_FILES += \
-BEA_CAN2CAN_DEMO_TEN1HC_HUST.map \
+CAN2CAN.map \
 
 SIZE_OUTPUT += \
 default.size.stdout \
 
 OBJDUMP_LIST += \
-BEA_CAN2CAN_DEMO_TEN1HC_HUST.list \
+CAN2CAN.list \
 
 OBJCOPY_HEX += \
-BEA_CAN2CAN_DEMO_TEN1HC_HUST.hex \
+CAN2CAN.hex \
 
 
 # All Target
 all: main-build
 
 # Main-build Target
-main-build: BEA_CAN2CAN_DEMO_TEN1HC_HUST.elf secondary-outputs
+main-build: CAN2CAN.elf secondary-outputs
 
 # Tool invocations
-BEA_CAN2CAN_DEMO_TEN1HC_HUST.elf BEA_CAN2CAN_DEMO_TEN1HC_HUST.map: $(OBJS) $(USER_OBJS) D:\STM\BEA_SourceCode\ Modify\STM32F405RGTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "BEA_CAN2CAN_DEMO_TEN1HC_HUST.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"D:\STM\BEA_SourceCode Modify\STM32F405RGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="BEA_CAN2CAN_DEMO_TEN1HC_HUST.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+CAN2CAN.elf CAN2CAN.map: $(OBJS) $(USER_OBJS) D:\STM\CAN2CAN\STM32F405RGTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "CAN2CAN.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"D:\STM\CAN2CAN\STM32F405RGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="CAN2CAN.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
@@ -73,19 +73,19 @@ default.size.stdout: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
 	@echo 'Finished building: $@'
 	@echo ' '
 
-BEA_CAN2CAN_DEMO_TEN1HC_HUST.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "BEA_CAN2CAN_DEMO_TEN1HC_HUST.list"
+CAN2CAN.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "CAN2CAN.list"
 	@echo 'Finished building: $@'
 	@echo ' '
 
-BEA_CAN2CAN_DEMO_TEN1HC_HUST.hex: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-objcopy  -O ihex $(EXECUTABLES) "BEA_CAN2CAN_DEMO_TEN1HC_HUST.hex"
+CAN2CAN.hex: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-objcopy  -O ihex $(EXECUTABLES) "CAN2CAN.hex"
 	@echo 'Finished building: $@'
 	@echo ' '
 
 # Other Targets
 clean:
-	-$(RM) BEA_CAN2CAN_DEMO_TEN1HC_HUST.elf BEA_CAN2CAN_DEMO_TEN1HC_HUST.hex BEA_CAN2CAN_DEMO_TEN1HC_HUST.list BEA_CAN2CAN_DEMO_TEN1HC_HUST.map default.size.stdout
+	-$(RM) CAN2CAN.elf CAN2CAN.hex CAN2CAN.list CAN2CAN.map default.size.stdout
 	-@echo ' '
 
 secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST) $(OBJCOPY_HEX)
